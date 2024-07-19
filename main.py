@@ -51,8 +51,8 @@ for n in code:
         for n in range(1, len(args)-1):
             combine_args()
         out=out+args[len(args)-1]+"=input(\""+tmp+"\")\n"
-        if not var_name.__contains__(args[len(args)-1]):
-            var_name.append(args[len(args)-1])
+        if not str_name.__contains__(args[len(args)-1]):
+            str_name.append(args[len(args)-1])
     elif cmd=="var":
         out=out+args[1]+"="+args[2]+"\n"
         var_name.append(args[1])
@@ -60,7 +60,7 @@ for n in code:
         out=out+args[1]+"="+args[2]+"\n"
         for n in range(1, len(args)-1):
             tmp=tmp+args[n]
-        var_name.append("\""+tmp+"\"")
+        str_name.append("\""+tmp+"\"")
     elif not cmd=="" and not cmd[0]=="#":
         print("Unknown Command: "+cmd+" at line: "+ str(i))
         sys.exit()
