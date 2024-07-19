@@ -9,6 +9,16 @@ code=code_file.readlines()
 code_file.close()
 for n in range(0, len(code)):
     code[n]=code[n].strip()
+def combine_args():
+    global tmp
+    global args
+    global n
+    if not var_name.__contains__(args[n]):
+        tmp=tmp+args[n]+" "  
+    elif not str_name.__contains__(args[n]):
+        tmp=tmp+"\"+str("+args[n]+")+\""
+    else:
+        tmp=tmp+"\"+"+args[n]+"+\""
 def sep_args(arg):
     i=0
     final=[]
@@ -24,6 +34,7 @@ i=1
 tmp=""
 out=""
 var_name=[]
+str_name=[]
 for n in code:
     if not n=="":
         args=sep_args(n)
@@ -33,25 +44,24 @@ for n in code:
     if cmd=="echo":
         tmp=""
         for n in range(1, len(args)):
-            if not var_name.__contains__(args[n]):
-                tmp=tmp+args[n]+" "
-            else:
-                tmp=tmp+"\"+"+args[n]+"+\""
+            combine_args()
         out=out+"print(\""+tmp+"\")\n"
     elif cmd=="input":
         tmp=""
         for n in range(1, len(args)-1):
-            if not var_name.__contains__(args[n]):
-                tmp=tmp+args[n]+" "
-            else:
-                tmp=tmp+"\"+"+args[n]+"+\""
+            combine_args()
         out=out+args[len(args)-1]+"=input(\""+tmp+"\")\n"
         if not var_name.__contains__(args[len(args)-1]):
             var_name.append(args[len(args)-1])
     elif cmd=="var":
-        out=out+args[1]+"="+args[2]
+        out=out+args[1]+"="+args[2]+"\n"
         var_name.append(args[1])
-    elif not cmd=="":
+    elif cmd=="str":
+        out=out+args[1]+"="+args[2]+"\n"
+        for n in range(1, len(args)-1):
+            tmp=tmp+args[n]
+        var_name.append("\""+tmp+"\"")
+    elif not cmd=="" and not cmd[0]=="#":
         print("Unknown Command: "+cmd+" at line: "+ str(i))
         sys.exit()
     i=i+1
