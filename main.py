@@ -15,6 +15,12 @@ except:
     sys.exit()
 for n in range(0, len(code)):
     code[n]=code[n].strip()
+if code[0][slice(2)]=="#!":
+    path=code[0][::-1][slice(len(code[0])-2)][::-1]
+elif len(sys.argv)==3:
+    path=sys.argv[2]
+else:
+    path=input("Capuchin Binary Path? ")
 def combine_args(start, end):
     global tmp
     global args
@@ -67,6 +73,7 @@ str_name=[]
 indent=0
 use_sys=0
 lists=[]
+defs=""
 for n in code:
     if not n=="":
         args=sep_args(n)
@@ -74,7 +81,16 @@ for n in code:
         args=[""]
     cmd=args[0]
     last=args[len(args)-1]
-    if cmd=="echo":
+    if defs.__contains__(cmd):
+        tmp="("
+        for n in range(1, len(args)):
+            tmp=tmp+args[n]
+            if n==len(args)-1:
+                tmp=tmp+")"
+            else:
+                tmp=tmp+", "
+        set_out(cmd+tmp+"\n")
+    elif cmd=="echo":
         combine_args(1, 0)
         set_out("print(\""+tmp+"\")\n")
     elif cmd=="input":
@@ -108,6 +124,7 @@ for n in code:
             indent=indent-1
         else:
             print("Unexpected Ending Curly Bracket: "+cmd+" at line: "+str(i))
+            sys.exit()
     elif cmd=="lower":
         set_out(args[2]+"="+args[1]+".lower()\n")
         add_str(last)
@@ -139,14 +156,50 @@ for n in code:
         set_out("sys.exit()\n")
     elif cmd=="break":
         set_out("break")
+    elif cmd=="def":
+        tmp=""
+        i=0
+        set_out("def ")
+        for n in args:
+            if not n=="def":
+                if tmp==", " and i==len(args)-1:
+                    tmp="):\n"
+                if not n=="-":
+                    set_out(n+tmp)
+                    if not tmp==", ":
+                        defs=defs+n+"\n"
+                else:
+                    tmp=", "
+                    set_out("(")
+            i=i+1
+        indent=indent+1
+    elif cmd=="include":
+        os.system(path+" "+args[1]+".cpu -i")
+        def_file=open("defs.txt", "r")
+        defs=defs+def_file.read()
+        def_file.close()
+        def_file=open(args[1]+".py", "r")
+        out=def_file.read()+out
+        def_file.close()
+    elif cmd=="printvar":
+        set_out("print("+args[1]+")\n")
     elif not cmd=="" and not cmd[0]=="#":
         print("Unknown Command: "+cmd+" at line: "+ str(i))
+        def_file=open("defs.txt", "a")
+        def_file.write(defs)
+        def_file.close()
         sys.exit()
     i=i+1
+file=os.path.splitext(file)[0]
 out_name=file+".py"
 out_file=open(out_name, "w")
 out_file.write(out)
 out_file.close()
+if sys.argv[len(sys.argv)-1]=="-i":
+    def_file=open("defs.txt", "w")
+    def_file.write(defs)
+    def_file.close()
+    sys.exit()
 if which("pyinstaller") is None:
     print("pyinstaller is required to continue comiling!")
     print("Try running pip install pyinstaller")
